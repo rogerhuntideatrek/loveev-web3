@@ -8,23 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
-     let connectedWallet = null;
-
-    // Check if solanaWeb3 is available
-    if (!window.solanaWeb3) {
-        messageParagraph.textContent = "solanaWeb3 is not available. Please check if the library is correctly loaded.";
-        return;
-    } else {
-    messageParagraph.textContent = "solanaWeb3 IS available.";
-        return;
-    }
-
     const displayWalletContents = async (publicKey) => {
         try {
             if (!window.solanaWeb3) {
                 throw new Error('solanaWeb3 is not available.');
             }
-            
+
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -54,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleWalletConnect = async (walletName) => {
-        console.log(window.solanaWeb3);
         if (connectedWallet) {
             messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
             return;
@@ -66,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const response = await window.solana.connect();
                     if (response.publicKey) {
                         connectedWallet = 'Phantom';
-                        messageParagraph.textContent = "Yay you logged in with Phantom Wallet!";
+                        messageParagraph.textContent = "Connected with Phantom Wallet!";
                         disconnectButton.style.display = 'block';
                         phantomButton.style.display = 'none';
                         solflareButton.style.display = 'none';
@@ -80,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const response = await window.solflare.connect();
                     if (response.publicKey) {
                         connectedWallet = 'Solflare';
-                        messageParagraph.textContent = "Yay you logged in with Solflare Wallet!";
+                        messageParagraph.textContent = "Connected with Solflare Wallet!";
                         disconnectButton.style.display = 'block';
                         phantomButton.style.display = 'none';
                         solflareButton.style.display = 'none';
