@@ -8,6 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
+     let connectedWallet = null;
+
+    // Check if solanaWeb3 is available
+    if (!window.solanaWeb3) {
+        messageParagraph.textContent = "solanaWeb3 is not available. Please check if the library is correctly loaded.";
+        return;
+    } else {
+    messageParagraph.textContent = "solanaWeb3 IS available.";
+        return;
+    }
+
     const displayWalletContents = async (publicKey) => {
         try {
             if (!window.solanaWeb3) {
