@@ -1,7 +1,3 @@
-import { Connection, PublicKey, clusterApiUrl, TOKEN_PROGRAM_ID } from "@solana/web3.js";
-
-const solanaWeb3 = require("@solana/web3.js");
-
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
