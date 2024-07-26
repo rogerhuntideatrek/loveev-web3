@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleWalletConnect = async (walletName) => {
         if (walletName === 'Phantom') {
             if (solana && solana.isPhantom) {
+                messageParagraph.textContent = "Trying Phantom...";
                 try {
                     const response = await solana.connect();
                     if (response.publicKey) {
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (walletName === 'Solflare') {
             try {
+                messageParagraph.textContent = "Trying Solflare...";
                 const solflare = window.solflare;
                 if (solflare) {
                     const response = await solflare.connect();
