@@ -1,3 +1,5 @@
+const solanaWeb3 = require("@solana/web3.js");
+console.log(solanaWeb3);
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
