@@ -1,27 +1,26 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoveEV Wallet Login</title>
+    <title>Solana Wallet Integration</title>
+    <!-- Load @solana/web3.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.66.0/dist/index.iife.js"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>LoveEV Wallet Login</h1>
     <button id="connect-phantom">Connect Phantom</button>
     <button id="connect-solflare">Connect Solflare</button>
-    <button id="disconnect" style="display: none;">Disconnect</button>
+    <button id="disconnect" style="display:none;">Disconnect</button>
     <p id="message"></p>
-    <div id="wallet-info" style="display: none;">
-        <h2>Wallet Contents</h2>
+    <div id="wallet-info" style="display:none;">
         <p id="wallet-contents"></p>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/@solana/web3.js/1.37.0/web3.min.js"></script>
+    <!-- Load your custom script -->
     <script src="script.js"></script>
 </body>
 </html>
-
-
 
 
