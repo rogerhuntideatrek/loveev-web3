@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleWalletConnect = async (walletName) => {
+        console.log(window.solanaWeb3);
         if (connectedWallet) {
             messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
             return;
