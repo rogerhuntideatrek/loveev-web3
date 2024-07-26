@@ -30,16 +30,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 { programId: solanaWeb3.TOKEN_PROGRAM_ID }
             );
 
+            // Check if token accounts were returned and handle unexpected data
+            if (!tokenAccounts || !tokenAccounts.value) {
+                throw new Error("Unexpected response format from getParsedTokenAccountsByOwner.");
+            }
+
             // Clear previous wallet contents
             walletContentsParagraph.innerHTML = '';
             let hasLargeBalance = false;
 
             // Check each token account for a balance greater than 100,000
             tokenAccounts.value.forEach((account) => {
-                const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
-                if (balance > 100000) {
-                    hasLargeBalance = true;
-                    walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
+                try {
+                    // Ensure account data exists and is in the expected format
+                    if (account && account.account && account.account.data && account.account.data.parsed) {
+                        const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
+                        if (balance > 100000) {
+                            hasLargeBalance = true;
+                            walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
+                        }
+                    } else {
+                        console.warn("Unexpected account data format:", account);
+                    }
+                } catch (accountError) {
+                    console.error("Error processing token account:", accountError);
                 }
             });
 
@@ -83,10 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
                 }
             } else if (walletName === 'Solflare') {
+                 messageParagraph.textContent = "Solflare Wallet connecting...";
                 // Check for Solflare wallet
                 if (window.solflare) {
                     // Attempt to connect to Solflare wallet
+                   try {
                     const response = await window.solflare.connect();
+                   } catch (err){
+                       console.log("err: ", err)
+                        messageParagraph.textContent = "Solflare Wallet failed";
+}
                     if (response.publicKey) {
                         connectedWallet = 'Solflare';
                         messageParagraph.textContent = "Connected with Solflare Wallet!";
