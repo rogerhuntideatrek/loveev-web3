@@ -84,7 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Check for Phantom wallet
                 if (window.solana && window.solana.isPhantom) {
                     // Attempt to connect to Phantom wallet
-                    const response = await window.solana.connect();
+                      try {
+                    const response = await window.solflare.connect();
+                          console.log("response: ", response)
+                   } catch (err){
+                       console.log("err: ", err)
+                        messageParagraph.textContent = "Phantom Wallet failed";
+}
                     if (response.publicKey) {
                         connectedWallet = 'Phantom';
                         messageParagraph.textContent = "Connected with Phantom Wallet!";
@@ -103,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Attempt to connect to Solflare wallet
                    try {
                     const response = await window.solflare.connect();
+                         console.log("response: ", response)
                    } catch (err){
                        console.log("err: ", err)
                         messageParagraph.textContent = "Solflare Wallet failed";
