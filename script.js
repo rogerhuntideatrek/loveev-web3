@@ -1,5 +1,5 @@
 const solanaWeb3 = require("@solana/web3.js");
-console.log(solanaWeb3);
+
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
@@ -12,16 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayWalletContents = async (publicKey) => {
         try {
-            // Create a connection to the Solana blockchain
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
-            // Fetch the token accounts for the public key
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
                 publicKey,
                 { programId: solanaWeb3.TOKEN_PROGRAM_ID }
             );
 
-            // Check if any token accounts have more than 100,000 tokens
+            walletContentsParagraph.innerHTML = '';
             let hasLargeBalance = false;
             tokenAccounts.value.forEach((account) => {
                 const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
@@ -105,4 +103,3 @@ document.addEventListener('DOMContentLoaded', () => {
     solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
     disconnectButton.addEventListener('click', handleDisconnect);
 });
-
