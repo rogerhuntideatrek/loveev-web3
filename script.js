@@ -8,12 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
+    // Check if solanaWeb3 is available
+    if (!window.solanaWeb3) {
+        messageParagraph.textContent = "solanaWeb3 is not available. Please check if the library is correctly loaded.";
+        return;
+    }
+
     const displayWalletContents = async (publicKey) => {
         try {
-            if (!window.solanaWeb3) {
-                throw new Error('solanaWeb3 is not available.');
-            }
-
+            const solanaWeb3 = window.solanaWeb3; // Ensure solanaWeb3 is accessed from window
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
