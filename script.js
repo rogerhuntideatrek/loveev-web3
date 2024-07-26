@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayWalletContents = async (publicKey) => {
         try {
+            if (!window.solanaWeb3) {
+                throw new Error('solanaWeb3 is not available.');
+            }
+            
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -34,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             walletInfoDiv.style.display = 'block';
         } catch (error) {
             console.error('Error fetching wallet contents:', error);
-            messageParagraph.textContent = "Error fetching wallet contents.";
+            messageParagraph.textContent = "Error fetching wallet contents: " + error.message;
         }
     };
 
@@ -44,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (walletName === 'Phantom') {
-            if (window.solana && window.solana.isPhantom) {
-                try {
+        try {
+            if (walletName === 'Phantom') {
+                if (window.solana && window.solana.isPhantom) {
                     const response = await window.solana.connect();
                     if (response.publicKey) {
                         connectedWallet = 'Phantom';
@@ -56,16 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         solflareButton.style.display = 'none';
                         displayWalletContents(response.publicKey);
                     }
-                } catch (error) {
-                    console.error('Error connecting to Phantom Wallet:', error);
-                    messageParagraph.textContent = "Failed to connect Phantom Wallet.";
+                } else {
+                    messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
                 }
-            } else {
-                messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
-            }
-        } else if (walletName === 'Solflare') {
-            if (window.solflare) {
-                try {
+            } else if (walletName === 'Solflare') {
+                if (window.solflare) {
                     const response = await window.solflare.connect();
                     if (response.publicKey) {
                         connectedWallet = 'Solflare';
@@ -75,13 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         solflareButton.style.display = 'none';
                         displayWalletContents(response.publicKey);
                     }
-                } catch (error) {
-                    console.error('Error connecting to Solflare Wallet:', error);
-                    messageParagraph.textContent = "Failed to connect Solflare Wallet.";
+                } else {
+                    messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
                 }
-            } else {
-                messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
             }
+        } catch (error) {
+            console.error(`Error connecting to ${walletName} Wallet:`, error);
+            messageParagraph.textContent = `Failed to connect ${walletName} Wallet: ${error.message}`;
         }
     };
 
