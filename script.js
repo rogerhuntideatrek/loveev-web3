@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         messageParagraph.textContent = "Error: solanaWeb3 is not available. Please ensure the @solana/web3.js library is correctly loaded.";
         console.error("solanaWeb3 is not available.");
         return;
+    } else {
+        messageParagraph.textContent = "SolanaWeb3 is Available";
+        console.error("solanaWeb3 IS available.");
     }
 
     // Function to display the contents of the wallet
