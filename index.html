@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoveEV Wallet Connect</title>
     <!-- Load @solana/web3.js from CDN -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <!-- Debug script to verify if solanaWeb3 is loaded -->
-    <script>
-        window.addEventListener('load', () => {
-            if (window.solanaWeb3) {
-                console.log('solanaWeb3 is loaded and available.');
-            } else {
-                console.error('solanaWeb3 is not available.');
-            }
-        });
-    </script>
+    <!-- Load your custom script -->
+    <script src="script.js" defer></script>
 </head>
 <body>
     <h1>LoveEV Wallet Connect</h1>
@@ -28,11 +19,5 @@
         <h2>Wallet Holdings:</h2>
         <p id="wallet-contents"></p>
     </div>
-    <!-- Load your custom script -->
-    <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
