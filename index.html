@@ -16,8 +16,8 @@
             box-sizing: border-box;
         }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0e0e0;
             color: #333;
             display: flex;
             justify-content: center;
@@ -25,32 +25,40 @@
             height: 100vh;
             padding: 20px;
         }
-        h1 {
-            color: #444;
-            margin-bottom: 20px;
-        }
         .container {
             text-align: center;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 400px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            max-width: 500px;
             width: 100%;
+        }
+        h1 {
+            color: #222;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
         button {
             background-color: #007bff;
             border: none;
-            color: white;
-            padding: 10px 20px;
+            color: #ffffff;
+            padding: 12px 24px;
             font-size: 16px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             margin: 10px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         button:hover {
             background-color: #0056b3;
+        }
+        button:active {
+            background-color: #004494;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
         }
         #disconnect {
             background-color: #dc3545;
@@ -58,16 +66,26 @@
         #disconnect:hover {
             background-color: #c82333;
         }
+        #disconnect:active {
+            background-color: #bd2130;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
         #message {
             margin-top: 20px;
             font-size: 18px;
+            font-weight: 500;
+            color: #555;
         }
         #wallet-info {
             margin-top: 20px;
+            font-size: 18px;
+            color: #444;
         }
         #wallet-contents {
             font-size: 16px;
-            color: #555;
+            color: #666;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -80,9 +98,4 @@
         <p id="message"></p>
         <div id="wallet-info" style="display:none;">
             <h2>Wallet Holdings:</h2>
-            <p id="wallet-contents"></p>
-        </div>
-    </div>
-</body>
-</html>
-
+            <p
