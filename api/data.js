@@ -6,8 +6,8 @@ const port = 3000;
 
 app.use(express.json());
 
-// Connect to Solana cluster
-const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+// Connect to Solana mainnet
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
 
 // API endpoint to get a balance
 app.get('/api/balance/:publicKey', async (req, res) => {
@@ -23,3 +23,4 @@ app.get('/api/balance/:publicKey', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
