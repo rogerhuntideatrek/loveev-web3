@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { programId: solanaWeb3.TOKEN_PROGRAM_ID }
             );
 
+            // Debug: Log the token accounts response
+            console.log('Token Accounts Response:', tokenAccounts);
+
             if (!tokenAccounts || !tokenAccounts.value) {
                 throw new Error("Unexpected response format from getParsedTokenAccountsByOwner.");
             }
@@ -36,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tokenAccounts.value.forEach((account) => {
                 try {
+                    // Debug: Log each account
+                    console.log('Token Account:', account);
+
                     if (account && account.account && account.account.data && account.account.data.parsed) {
                         const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
                         if (balance > 100000) {
