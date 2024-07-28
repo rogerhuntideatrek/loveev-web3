@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("publickey in disp: ", publicKey)
         const solanaWeb3 = window.solanaWeb3;
         const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-
+console.log(publicKey, solanaWeb3.TOKEN_PROGRAM_ID)
         try {
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
                 publicKey,
