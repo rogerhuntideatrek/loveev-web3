@@ -10,7 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Verify that the solanaWeb3 and splToken libraries are loaded
     if (!window.solanaWeb3 || !window.splToken) {
-        messageParagraph.textContent = "Error: Required libraries are not available.";
+        if (!window.solanaWeb3){
+            messageParagraph.textContent = `Error: solanaWeb3 not available.`;
+        }
+
+        if (!window.splToken){
+            messageParagraph.textContent = `\nError: spltoken not available.`;
+        }
+        
         console.error("Required libraries are not available.");
         return;
     }
