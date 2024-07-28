@@ -1,3 +1,6 @@
+import { Connection, PublicKey, clusterApiUrl } from 'https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js';
+import { TOKEN_PROGRAM_ID } from 'https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
@@ -8,20 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
-    // Ensure solanaWeb3 and splToken are available
+    // Verify that solanaWeb3 and splToken are available
     if (!window.solanaWeb3 || !window.splToken) {
         messageParagraph.textContent = "Error: Required libraries are not available.";
         console.error("Required libraries are not available.");
         return;
     }
 
-    const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
-    const { TOKEN_PROGRAM_ID } = window.splToken;
+    const connection = new Connection(clusterApiUrl('mainnet-beta'));
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKeyStr) => {
-        const connection = new Connection(clusterApiUrl('mainnet-beta'));
-
         let publicKey;
         try {
             publicKey = new PublicKey(publicKeyStr);
