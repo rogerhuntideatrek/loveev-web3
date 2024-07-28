@@ -28,10 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = new solanaWeb3.PublicKey(publicKey);
             console.log('Public Key:', key.toBase58());
 
-            const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXC1h9n1t6iWbCzUQu7k');
-
-             console.log('TOKEN_PROGRAM_ID RAW:', TOKEN_PROGRAM_ID);
-            console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
+            // Manually initialize TOKEN_PROGRAM_ID if it's undefined
+            let TOKEN_PROGRAM_ID;
+            try {
+                TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXC1h9n1t6iWbCzUQu7k');
+                console.log('TOKEN_PROGRAM_ID RAW:', TOKEN_PROGRAM_ID);
+                console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
+            } catch (error) {
+                console.error('Error initializing TOKEN_PROGRAM_ID:', error);
+                messageParagraph.textContent = `Error initializing TOKEN_PROGRAM_ID: ${error.message}`;
+                return;
+            }
 
             try {
                 const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -68,105 +75,4 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (!hasLargeBalance) {
-                    walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
-                }
-
-                walletInfoDiv.style.display = 'block';
-            } catch (fetchError) {
-                console.error('Error fetching token accounts:', fetchError);
-                messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
-            }
-        } catch (keyError) {
-            console.error('Invalid Public Key:', keyError);
-            messageParagraph.textContent = `Invalid Public Key: ${keyError.message}`;
-        }
-    };
-
-    // Function to handle wallet connection
-    const handleWalletConnect = async (walletName) => {
-        if (connectedWallet) {
-            messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
-            return;
-        } else {
-            messageParagraph.textContent = `Connecting ${walletName}...`;
-        }
-
-        try {
-            if (walletName === 'Phantom') {
-                if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.phantom.solana.connect();
-                        console.log('Phantom Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
-                            connectedWallet = 'Phantom';
-                            messageParagraph.textContent = "Connected with Phantom Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey);
-                        } else {
-                            messageParagraph.textContent = 'No Public Key received from Phantom.';
-                        }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Phantom Wallet failed to connect.";
-                        console.error("Phantom Wallet connection error:", connectError);
-                    }
-                } else {
-                    messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
-                }
-            } else if (walletName === 'Solflare') {
-                if (window.solflare) {
-                    try {
-                        const response = await window.solflare.connect();
-                        console.log('Solflare Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
-                            connectedWallet = 'Solflare';
-                            messageParagraph.textContent = "Connected with Solflare Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey);
-                        } else {
-                            messageParagraph.textContent = 'No Public Key received from Solflare.';
-                        }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Solflare Wallet failed to connect.";
-                        console.error("Solflare Wallet connection error:", connectError);
-                    }
-                } else {
-                    messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
-                }
-            } else {
-                messageParagraph.textContent = "Unknown wallet type.";
-                console.error(`Unknown wallet type: ${walletName}`);
-            }
-        } catch (error) {
-            console.error(`Error connecting to ${walletName} Wallet:`, error);
-            messageParagraph.textContent = `Failed to connect ${walletName} Wallet: ${error.message}`;
-        }
-    };
-
-    // Function to handle wallet disconnection
-    const handleDisconnect = () => {
-        if (connectedWallet) {
-            connectedWallet = null;
-            messageParagraph.textContent = "Wallet disconnected.";
-            walletInfoDiv.style.display = 'none';
-            walletContentsParagraph.textContent = '';
-            disconnectButton.style.display = 'none';
-            phantomButton.style.display = 'block';
-            solflareButton.style.display = 'block';
-        } else {
-            messageParagraph.textContent = "No wallet is currently connected.";
-        }
-    };
-
-    // Attach event listeners to buttons
-    phantomButton.addEventListener('click', () => handleWalletConnect('Phantom'));
-    solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
-    disconnectButton.addEventListener('click', handleDisconnect);
-});
+                    
