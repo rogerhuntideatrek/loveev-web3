@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKey) => {
+        console.log("publickey in disp: ", publicKey)
         const solanaWeb3 = window.solanaWeb3;
         const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
