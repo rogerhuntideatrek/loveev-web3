@@ -23,12 +23,17 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const solanaWeb3 = window.solanaWeb3;
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-
+console.log("solanaWeb3, connection: ", solanaWeb3, connection)
             // Fetch token accounts for the provided public key
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+            try {
+            let tokenAccounts = await connection.getParsedTokenAccountsByOwner(
                 publicKey,
                 { programId: solanaWeb3.TOKEN_PROGRAM_ID }
             );
+                console.log("tokenAccounts: ", tokenAccounts)
+            } catch {
+              let  tokenAccounts = undefined
+            }
 
             // Debug: Log the token accounts response
             console.log('Token Accounts Response:', tokenAccounts);
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletName === 'Phantom') {
                 if (window.solana && window.solana.isPhantom) {
                     try {
-                        const response = await window.solana.connect();
+                        const response = await window.phantom.solana.connect();
                        
         console.error(`response: `, response);
                         if (response.publicKey) {
