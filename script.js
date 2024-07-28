@@ -1,6 +1,3 @@
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
@@ -11,15 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
-    // Verify that the solanaWeb3 library is loaded
-    if (!window.solanaWeb3) {
-        messageParagraph.textContent = "Error: solanaWeb3 is not available. Please ensure the @solana/web3.js library is correctly loaded.";
-        console.error("solanaWeb3 is not available.");
+    // Ensure solanaWeb3 and splToken are available
+    if (!window.solanaWeb3 || !window.splToken) {
+        messageParagraph.textContent = "Error: Required libraries are not available.";
+        console.error("Required libraries are not available.");
         return;
-    } else {
-        messageParagraph.textContent = "SolanaWeb3 is Available";
-        console.info("solanaWeb3 IS available.");
     }
+
+    const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
+    const { TOKEN_PROGRAM_ID } = window.splToken;
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKeyStr) => {
@@ -93,11 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletName === 'Phantom') {
                 if (window.solana && window.solana.isPhantom) {
                     try {
-                        const response = await window.phantom.solana.connect();
+                        const response = await window.solana.connect();
                         console.log('Phantom Connect Response:', response);
 
                         if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
+                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
                             connectedWallet = 'Phantom';
                             messageParagraph.textContent = "Connected with Phantom Wallet!";
                             disconnectButton.style.display = 'block';
@@ -121,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('Solflare Connect Response:', response);
 
                         if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
+                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
                             connectedWallet = 'Solflare';
                             messageParagraph.textContent = "Connected with Solflare Wallet!";
                             disconnectButton.style.display = 'block';
@@ -139,8 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
                 }
             } else {
-                messageParagraph.textContent = "Unknown wallet type.";
-                console.error(`Unknown wallet type: ${walletName}`);
+                messageParagraph.textContent = "Unsupported wallet type.";
             }
         } catch (error) {
             console.error(`Error connecting to ${walletName} Wallet:`, error);
@@ -158,8 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             disconnectButton.style.display = 'none';
             phantomButton.style.display = 'block';
             solflareButton.style.display = 'block';
-        } else {
-            messageParagraph.textContent = "No wallet is currently connected.";
         }
     };
 
