@@ -8,16 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
-    // Verify that the solanaWeb3 and splToken libraries are loaded
+    // Check if libraries are available
     if (!window.solanaWeb3 || !window.splToken) {
-        if (!window.solanaWeb3){
-            messageParagraph.textContent = `Error: solanaWeb3 not available.`;
-        }
-
-        if (!window.splToken){
-            messageParagraph.textContent = `\nError: spltoken not available.`;
-        }
-        
+        messageParagraph.textContent = "Error: Required libraries are not available.";
         console.error("Required libraries are not available.");
         return;
     }
@@ -116,17 +109,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             solflareButton.style.display = 'none';
                             displayWalletContents(response.publicKey.toBase58());
                         } else {
-                            messageParagraph.textContent = 'No Public Key received from Phantom.';
+                            messageParagraph.textContent = 'No public key returned.';
                         }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Phantom Wallet failed to connect.";
-                        console.error("Phantom Wallet connection error:", connectError);
+                    } catch (error) {
+                        messageParagraph.textContent = `Error connecting Phantom: ${error.message}`;
+                        console.error('Error connecting Phantom:', error);
                     }
                 } else {
-                    messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
+                    messageParagraph.textContent = 'Phantom wallet not detected.';
                 }
             } else if (walletName === 'Solflare') {
-                if (window.solflare) {
+                if (window.solflare && window.solflare.isSolflare) {
                     try {
                         const response = await window.solflare.connect();
                         console.log('Solflare Connect Response:', response);
@@ -140,39 +133,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             solflareButton.style.display = 'none';
                             displayWalletContents(response.publicKey.toBase58());
                         } else {
-                            messageParagraph.textContent = 'No Public Key received from Solflare.';
+                            messageParagraph.textContent = 'No public key returned.';
                         }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Solflare Wallet failed to connect.";
-                        console.error("Solflare Wallet connection error:", connectError);
+                    } catch (error) {
+                        messageParagraph.textContent = `Error connecting Solflare: ${error.message}`;
+                        console.error('Error connecting Solflare:', error);
                     }
                 } else {
-                    messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
+                    messageParagraph.textContent = 'Solflare wallet not detected.';
                 }
-            } else {
-                messageParagraph.textContent = "Unsupported wallet type.";
             }
         } catch (error) {
-            console.error(`Error connecting to ${walletName} Wallet:`, error);
-            messageParagraph.textContent = `Failed to connect ${walletName} Wallet: ${error.message}`;
+            messageParagraph.textContent = `Error: ${error.message}`;
+            console.error('Error:', error);
         }
     };
 
-    // Function to handle wallet disconnection
-    const handleDisconnect = () => {
-        if (connectedWallet) {
-            connectedWallet = null;
-            messageParagraph.textContent = "Wallet disconnected.";
-            walletInfoDiv.style.display = 'none';
-            walletContentsParagraph.textContent = '';
-            disconnectButton.style.display = 'none';
-            phantomButton.style.display = 'block';
-            solflareButton.style.display = 'block';
-        }
-    };
-
-    // Attach event listeners to buttons
+    // Add event listeners
     phantomButton.addEventListener('click', () => handleWalletConnect('Phantom'));
     solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
-    disconnectButton.addEventListener('click', handleDisconnect);
+    disconnectButton.addEventListener('click', () => {
+        connectedWallet = null;
+        phantomButton.style.display = 'block';
+        solflareButton.style.display = 'block';
+        disconnectButton.style.display = 'none';
+        messageParagraph.textContent = "Disconnected.";
+        walletInfoDiv.style.display = 'none';
+    });
 });
