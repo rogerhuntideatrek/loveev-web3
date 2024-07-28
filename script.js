@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
     const { TOKEN_PROGRAM_ID } = window.splToken;
 
+    // Verify TOKEN_PROGRAM_ID is available
+    if (!TOKEN_PROGRAM_ID) {
+        messageParagraph.textContent = "Error: TOKEN_PROGRAM_ID is not available.";
+        console.error("TOKEN_PROGRAM_ID is not available.");
+        return;
+    }
+
     const connection = new Connection(clusterApiUrl('mainnet-beta'));
 
     // Function to display the contents of the wallet
