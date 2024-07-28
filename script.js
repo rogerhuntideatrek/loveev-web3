@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Public Key:', key.toBase58());
 
             const TOKEN_PROGRAM_ID = solanaWeb3.TOKEN_PROGRAM_ID;
+             console.log('TOKEN_PROGRAM_ID RAW:', TOKEN_PROGRAM_ID);
             console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
 
             try {
