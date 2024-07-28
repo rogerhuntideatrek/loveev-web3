@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const connection = new Connection(clusterApiUrl('mainnet-beta'));
-console.log(
+
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKeyStr) => {
         let publicKey;
