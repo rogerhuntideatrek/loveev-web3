@@ -1,171 +1,117 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const phantomButton = document.getElementById('connect-phantom');
-    const solflareButton = document.getElementById('connect-solflare');
-    const disconnectButton = document.getElementById('disconnect');
-    const messageParagraph = document.getElementById('message');
-    const walletInfoDiv = document.getElementById('wallet-info');
-    const walletContentsParagraph = document.getElementById('wallet-contents');
-
-    let connectedWallet = null;
-
-    // Verify that the solanaWeb3 and splToken libraries are loaded
-    if (!window.solanaWeb3 || !window.splToken) {
-        messageParagraph.textContent = "Error: Required libraries are not available.";
-        console.error("Required libraries are not available.");
-        return;
-    }
-
-    const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
-    const { TOKEN_PROGRAM_ID } = window.splToken;
-
-    // Verify TOKEN_PROGRAM_ID is available
-    if (!TOKEN_PROGRAM_ID) {
-        messageParagraph.textContent = "Error: TOKEN_PROGRAM_ID is not available.";
-        console.error("TOKEN_PROGRAM_ID is not available.");
-        return;
-    }
-
-    const connection = new Connection(clusterApiUrl('mainnet-beta'));
-
-    // Function to display the contents of the wallet
-    const displayWalletContents = async (publicKeyStr) => {
-        let publicKey;
-        try {
-            publicKey = new PublicKey(publicKeyStr);
-            console.log('Public Key:', publicKey.toBase58());
-        } catch (error) {
-            console.error('Invalid Public Key:', error);
-            messageParagraph.textContent = `Error: Invalid Public Key - ${error.message}`;
-            return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoveEV Wallet Connect</title>
+    <!-- Load @solana/web3.js from CDN -->
+    <script src="https://unpkg.com/@solana/web3.js@1.54.0/dist/solana-web3.min.js"></script>
+    <!-- Load @solana/spl-token from CDN -->
+    <script src="https://unpkg.com/@solana/spl-token@0.2.0/dist/spl-token.min.js"></script>
+    <!-- Load your custom script -->
+    <script src="script.js"></script>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        try {
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-                publicKey,
-                { programId: TOKEN_PROGRAM_ID }
-            );
-
-            console.log("Raw Token Accounts Response:", tokenAccounts);
-
-            if (!tokenAccounts || !tokenAccounts.value) {
-                throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
-            }
-
-            walletContentsParagraph.innerHTML = '';
-            let hasLargeBalance = false;
-
-            tokenAccounts.value.forEach((account) => {
-                try {
-                    console.log('Token Account:', account);
-
-                    if (account && account.account && account.account.data && account.account.data.parsed) {
-                        const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
-                        if (balance > 100000) {
-                            hasLargeBalance = true;
-                            walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
-                        }
-                    } else {
-                        console.warn("Unexpected account data format:", account);
-                    }
-                } catch (accountError) {
-                    console.error("Error processing token account:", accountError);
-                    walletContentsParagraph.innerHTML += `Error processing token account: ${accountError.message}<br>`;
-                }
-            });
-
-            if (!hasLargeBalance) {
-                walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
-            }
-
-            walletInfoDiv.style.display = 'block';
-        } catch (fetchError) {
-            console.error('Error fetching token accounts:', fetchError);
-            messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #e6dee9);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
         }
-    };
-
-    // Function to handle wallet connection
-    const handleWalletConnect = async (walletName) => {
-        if (connectedWallet) {
-            messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
-            return;
-        } else {
-            messageParagraph.textContent = `Connecting ${walletName}...`;
+        @keyframes gradientFlow {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
         }
-
-        try {
-            if (walletName === 'Phantom') {
-                if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.solana.connect();
-                        console.log('Phantom Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
-                            connectedWallet = 'Phantom';
-                            messageParagraph.textContent = "Connected with Phantom Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey.toBase58());
-                        } else {
-                            messageParagraph.textContent = 'No Public Key received from Phantom.';
-                        }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Phantom Wallet failed to connect.";
-                        console.error("Phantom Wallet connection error:", connectError);
-                    }
-                } else {
-                    messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
-                }
-            } else if (walletName === 'Solflare') {
-                if (window.solflare) {
-                    try {
-                        const response = await window.solflare.connect();
-                        console.log('Solflare Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
-                            connectedWallet = 'Solflare';
-                            messageParagraph.textContent = "Connected with Solflare Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey.toBase58());
-                        } else {
-                            messageParagraph.textContent = 'No Public Key received from Solflare.';
-                        }
-                    } catch (connectError) {
-                        messageParagraph.textContent = "Solflare Wallet failed to connect.";
-                        console.error("Solflare Wallet connection error:", connectError);
-                    }
-                } else {
-                    messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
-                }
-            } else {
-                messageParagraph.textContent = "Unsupported wallet type.";
-            }
-        } catch (error) {
-            console.error(`Error connecting to ${walletName} Wallet:`, error);
-            messageParagraph.textContent = `Failed to connect ${walletName} Wallet: ${error.message}`;
+        .container {
+            text-align: center;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
         }
-    };
-
-    // Function to handle wallet disconnection
-    const handleDisconnect = () => {
-        if (connectedWallet) {
-            connectedWallet = null;
-            messageParagraph.textContent = "Wallet disconnected.";
-            walletInfoDiv.style.display = 'none';
-            walletContentsParagraph.textContent = '';
-            disconnectButton.style.display = 'none';
-            phantomButton.style.display = 'block';
-            solflareButton.style.display = 'block';
+        h1 {
+            color: #222;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
-    };
-
-    // Attach event listeners to buttons
-    phantomButton.addEventListener('click', () => handleWalletConnect('Phantom'));
-    solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
-    disconnectButton.addEventListener('click', handleDisconnect);
-});
+        button {
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            background-color: #004494;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
+        #disconnect {
+            background-color: #dc3545;
+        }
+        #disconnect:hover {
+            background-color: #c82333;
+        }
+        #disconnect:active {
+            background-color: #bd2130;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #555;
+        }
+        #wallet-info {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #444;
+        }
+        #wallet-contents {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LoveEV Wallet Connect</h1>
+        <button id="connect-phantom">Connect Phantom</button>
+        <button id="connect-solflare">Connect Solflare</button>
+        <button id="disconnect" style="display:none;">Disconnect</button>
+        <p id="message"></p>
+        <div id="wallet-info" style="display:none;">
+            <h2>Wallet Holdings:</h2>
+            <p id="wallet-contents"></p>
+        </div>
+    </div>
+</body>
+</html>
