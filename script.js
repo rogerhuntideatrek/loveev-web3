@@ -10,14 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if libraries are available
     if (!window.solanaWeb3 || !window.splToken) {
-        messageParagraph.textContent = `Error: Required libraries are not available.`;
-        if (!window.solanaWeb3){
-messageParagraph.textContent += `\nsolanaWeb3 not available.`;
-        }
-
-        if (!window.splToken){
-messageParagraph.textContent += `\nsplToken not available.`;
-        }
+        messageParagraph.textContent = "Error: Required libraries are not available.";
         console.error("Required libraries are not available.");
         return;
     }
