@@ -84,9 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.solana && window.solana.isPhantom) {
                     try {
                         const response = await window.solana.connect();
-                         messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
-        console.error(`Public Key: `, response);
+                       
+        console.error(`response: `, response);
                         if (response.publicKey) {
+                            messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
                             connectedWallet = 'Phantom';
                             messageParagraph.textContent = "Connected with Phantom Wallet!";
                             disconnectButton.style.display = 'block';
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             displayWalletContents(response.publicKey);
                         } else {
 messageParagraph.textContent += `\nNo Public Key`;
-        console.error(`Public Key: `, response);
+       
                         }
                     } catch (err) {
                         messageParagraph.textContent = "Phantom Wallet failed to connect.";
@@ -108,9 +109,10 @@ messageParagraph.textContent += `\nNo Public Key`;
                 if (window.solflare) {
                     try {
                         const response = await window.solflare.connect();
-                        messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
+                       
         console.error(`Public Key: `, response);
                         if (response.publicKey) {
+                             messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
                             connectedWallet = 'Solflare';
                             messageParagraph.textContent = "Connected with Solflare Wallet!";
                             disconnectButton.style.display = 'block';
@@ -119,7 +121,7 @@ messageParagraph.textContent += `\nNo Public Key`;
                             displayWalletContents(response.publicKey);
                         } else {
 messageParagraph.textContent += `\nNo Public Key`;
-        console.error(`Public Key: `, response);
+   
                         }
                     } catch (err) {
                         messageParagraph.textContent = "Solflare Wallet failed to connect.";
