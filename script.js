@@ -21,14 +21,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKey) => {
         console.log("publickey in disp: ", publicKey)
-        const solanaWeb3 = window.solanaWeb3;
+         const solanaWeb3 = window.solanaWeb3;
         const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-console.log(publicKey, solanaWeb3.TOKEN_PROGRAM_ID)
+try {
+    const publicKey = new solanaWeb3.PublicKey(publicKey);  // Replace with your actual public key
+    console.log('Public Key:', publicKey.toBase58());
+} catch (error) {
+    console.error('Invalid Public Key:', error);
+}
+
+		const TOKEN_PROGRAM_ID = solanaWeb3.TOKEN_PROGRAM_ID;
+console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
+
+    
+
+        
         try {
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-                publicKey,
-                { programId: solanaWeb3.TOKEN_PROGRAM_ID }
-            );
+                try {
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+        publicKey,
+        { programId: solanaWeb3.TOKEN_PROGRAM_ID }
+    );
+    console.log("Raw Token Accounts Response:", tokenAccounts);
+    if (!tokenAccounts || !tokenAccounts.value) {
+        console.error('Unexpected response format:', tokenAccounts);
+    }
+} catch (error) {
+    console.error('Error fetching token accounts:', error);
+}
             console.log("Token Accounts:", tokenAccounts);
             if (!tokenAccounts || !tokenAccounts.value) {
                 throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
