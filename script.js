@@ -15,74 +15,68 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     } else {
         messageParagraph.textContent = "SolanaWeb3 is Available";
-        console.error("solanaWeb3 IS available.");
+        console.info("solanaWeb3 IS available.");
     }
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKey) => {
-        console.log("publickey in disp: ", publicKey)
-         const solanaWeb3 = window.solanaWeb3;
+        console.log("PublicKey in displayWalletContents:", publicKey);
+        const solanaWeb3 = window.solanaWeb3;
         const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-try {
-    const publicKey = new solanaWeb3.PublicKey(publicKey);  // Replace with your actual public key
-    console.log('Public Key:', publicKey.toBase58());
-} catch (error) {
-    console.error('Invalid Public Key:', error);
-}
 
-		const TOKEN_PROGRAM_ID = solanaWeb3.TOKEN_PROGRAM_ID;
-console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
-
-    
-
-        
         try {
-                try {
-    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        publicKey,
-        { programId: solanaWeb3.TOKEN_PROGRAM_ID }
-    );
-    console.log("Raw Token Accounts Response:", tokenAccounts);
-    if (!tokenAccounts || !tokenAccounts.value) {
-        console.error('Unexpected response format:', tokenAccounts);
-    }
-} catch (error) {
-    console.error('Error fetching token accounts:', error);
-}
-            console.log("Token Accounts:", tokenAccounts);
-            if (!tokenAccounts || !tokenAccounts.value) {
-                throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
-            }
+            const key = new solanaWeb3.PublicKey(publicKey);
+            console.log('Public Key:', key.toBase58());
 
-            walletContentsParagraph.innerHTML = '';
-            let hasLargeBalance = false;
+            const TOKEN_PROGRAM_ID = solanaWeb3.TOKEN_PROGRAM_ID;
+            console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
 
-            tokenAccounts.value.forEach((account) => {
-                try {
-                    console.log('Token Account:', account);
+            try {
+                const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+                    key,
+                    { programId: TOKEN_PROGRAM_ID }
+                );
 
-                    if (account && account.account && account.account.data && account.account.data.parsed) {
-                        const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
-                        if (balance > 100000) {
-                            hasLargeBalance = true;
-                            walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
-                        }
-                    } else {
-                        console.warn("Unexpected account data format:", account);
-                    }
-                } catch (accountError) {
-                    console.error("Error processing token account:", accountError);
+                console.log("Raw Token Accounts Response:", tokenAccounts);
+
+                if (!tokenAccounts || !tokenAccounts.value) {
+                    throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
                 }
-            });
 
-            if (!hasLargeBalance) {
-                walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
+                walletContentsParagraph.innerHTML = '';
+                let hasLargeBalance = false;
+
+                tokenAccounts.value.forEach((account) => {
+                    try {
+                        console.log('Token Account:', account);
+
+                        if (account && account.account && account.account.data && account.account.data.parsed) {
+                            const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
+                            if (balance > 100000) {
+                                hasLargeBalance = true;
+                                walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
+                            }
+                        } else {
+                            console.warn("Unexpected account data format:", account);
+                        }
+                    } catch (accountError) {
+                        console.error("Error processing token account:", accountError);
+                        walletContentsParagraph.innerHTML += `Error processing token account: ${accountError.message}<br>`;
+                    }
+                });
+
+                if (!hasLargeBalance) {
+                    walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
+                }
+
+                walletInfoDiv.style.display = 'block';
+            } catch (fetchError) {
+                console.error('Error fetching token accounts:', fetchError);
+                messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
             }
-
-            walletInfoDiv.style.display = 'block';
-        } catch (error) {
-            console.error('Error fetching wallet contents:', error);
-            messageParagraph.textContent = `Error fetching wallet contents: ${error.message}`;
+        } catch (keyError) {
+            console.error('Invalid Public Key:', keyError);
+            messageParagraph.textContent = `Invalid Public Key: ${keyError.message}`;
         }
     };
 
@@ -100,10 +94,10 @@ console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
                 if (window.solana && window.solana.isPhantom) {
                     try {
                         const response = await window.phantom.solana.connect();
-                       
-                        console.error(`response: `, response);
+                        console.log('Phantom Connect Response:', response);
+
                         if (response.publicKey) {
-                            messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
+                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
                             connectedWallet = 'Phantom';
                             messageParagraph.textContent = "Connected with Phantom Wallet!";
                             disconnectButton.style.display = 'block';
@@ -111,11 +105,11 @@ console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
                             solflareButton.style.display = 'none';
                             displayWalletContents(response.publicKey);
                         } else {
-                            messageParagraph.textContent += `\nNo Public Key`;
+                            messageParagraph.textContent = 'No Public Key received from Phantom.';
                         }
-                    } catch (err) {
+                    } catch (connectError) {
                         messageParagraph.textContent = "Phantom Wallet failed to connect.";
-                        console.error("Phantom Wallet error:", err);
+                        console.error("Phantom Wallet connection error:", connectError);
                     }
                 } else {
                     messageParagraph.textContent = "Phantom Wallet not found. Please install it.";
@@ -124,10 +118,10 @@ console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
                 if (window.solflare) {
                     try {
                         const response = await window.solflare.connect();
-                       
-                        console.error(`Public Key: `, response);
+                        console.log('Solflare Connect Response:', response);
+
                         if (response.publicKey) {
-                             messageParagraph.textContent += `\nPublic Key: ${response.publicKey}`;
+                            messageParagraph.textContent = `Public Key: ${response.publicKey}`;
                             connectedWallet = 'Solflare';
                             messageParagraph.textContent = "Connected with Solflare Wallet!";
                             disconnectButton.style.display = 'block';
@@ -135,15 +129,18 @@ console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
                             solflareButton.style.display = 'none';
                             displayWalletContents(response.publicKey);
                         } else {
-                            messageParagraph.textContent += `\nNo Public Key`;
+                            messageParagraph.textContent = 'No Public Key received from Solflare.';
                         }
-                    } catch (err) {
+                    } catch (connectError) {
                         messageParagraph.textContent = "Solflare Wallet failed to connect.";
-                        console.error("Solflare Wallet error:", err);
+                        console.error("Solflare Wallet connection error:", connectError);
                     }
                 } else {
                     messageParagraph.textContent = "Solflare Wallet not found. Please install it.";
                 }
+            } else {
+                messageParagraph.textContent = "Unknown wallet type.";
+                console.error(`Unknown wallet type: ${walletName}`);
             }
         } catch (error) {
             console.error(`Error connecting to ${walletName} Wallet:`, error);
@@ -161,6 +158,8 @@ console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
             disconnectButton.style.display = 'none';
             phantomButton.style.display = 'block';
             solflareButton.style.display = 'block';
+        } else {
+            messageParagraph.textContent = "No wallet is currently connected.";
         }
     };
 
