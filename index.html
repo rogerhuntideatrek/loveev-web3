@@ -19,7 +19,8 @@
           let connectedWallet = null;
 
           // Ensure solanaWeb3 and splToken are available
-          if (!window.solanaWeb3 || !window.splToken) {
+          //!window.splToken
+          if (!window.solanaWeb3 ) { 
               messageParagraph.textContent = "Error: Required libraries are not available.";
               console.error("Required libraries are not available.");
               return;
