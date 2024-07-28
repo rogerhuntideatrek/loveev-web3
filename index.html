@@ -9,7 +9,7 @@
     <!-- Load @solana/spl-token from CDN -->
     <script src="https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js"></script>
     <!-- Load your custom script -->
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
     <style>
         /* Basic reset */
         * {
@@ -62,56 +62,4 @@
             cursor: pointer;
             margin: 10px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:active {
-            background-color: #004494;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transform: translateY(2px);
-        }
-        #disconnect {
-            background-color: #dc3545;
-        }
-        #disconnect:hover {
-            background-color: #c82333;
-        }
-        #disconnect:active {
-            background-color: #bd2130;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transform: translateY(2px);
-        }
-        #message {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: 500;
-            color: #555;
-        }
-        #wallet-info {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #444;
-        }
-        #wallet-contents {
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>LoveEV Wallet Connect</h1>
-        <button id="connect-phantom">Connect Phantom</button>
-        <button id="connect-solflare">Connect Solflare</button>
-        <button id="disconnect" style="display:none;">Disconnect</button>
-        <p id="message"></p>
-        <div id="wallet-info" style="display:none;">
-            <h2>Wallet Holdings:</h2>
-            <p id="wallet-contents"></p>
-        </div>
-    </div>
-</body>
-</html>
+            box-shad
