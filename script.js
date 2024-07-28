@@ -1,3 +1,6 @@
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const phantomButton = document.getElementById('connect-phantom');
     const solflareButton = document.getElementById('connect-solflare');
@@ -20,28 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKeyStr) => {
-        const solanaWeb3 = window.solanaWeb3;
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+        const connection = new Connection(clusterApiUrl('mainnet-beta'));
 
         let publicKey;
-
         try {
-            publicKey = new solanaWeb3.PublicKey(publicKeyStr);
+            publicKey = new PublicKey(publicKeyStr);
             console.log('Public Key:', publicKey.toBase58());
         } catch (error) {
             console.error('Invalid Public Key:', error);
             messageParagraph.textContent = `Error: Invalid Public Key - ${error.message}`;
-            return;
-        }
-
-        let TOKEN_PROGRAM_ID;
-        try {
-            TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXC1h9n1t6iWbCzUQu7k');
-            console.log('TOKEN_PROGRAM_ID RAW:', TOKEN_PROGRAM_ID);
-            console.log('TOKEN_PROGRAM_ID:', TOKEN_PROGRAM_ID.toBase58());
-        } catch (error) {
-            console.error('Error initializing TOKEN_PROGRAM_ID:', error);
-            messageParagraph.textContent = `Error initializing TOKEN_PROGRAM_ID: ${error.message}`;
             return;
         }
 
