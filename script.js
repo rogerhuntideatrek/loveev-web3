@@ -14,9 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!window.solanaWeb3){
             messageParagraph.textContent += `\nsolanaWeb3 not available.`;
         }
-        if (!window.splToken){
-            messageParagraph.textContent += `\nsplToken not available.`;
-        }
+        
         
     }
 
