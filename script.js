@@ -10,7 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if the required libraries are available
     if (!window.solana || !window.solana.isPhantom || !window.solflare || !window.solflare.isSolflare) {
-        messageParagraph.textContent = "Error: Required libraries or wallets are not available.";
+        messageParagraph.textContent = `Error: Required libraries or wallets are not available.`;
+        if (!window.solana){
+           messageParagraph.textContent += `\nsolana is not available`
+        }
+        if (!window.solana.isPhantom){
+           messageParagraph.textContent += `\nphantom is not available`
+        }
+        if (!window.solflare){
+           messageParagraph.textContent += `\nsolflare is not available`
+        }
+        if (!window.solflare.isSolflare){
+           messageParagraph.textContent += `\nisSolflare is not available`
+        }
         console.error("Required libraries or wallets are not available.");
         return;
     }
