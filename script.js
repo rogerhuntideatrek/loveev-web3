@@ -9,19 +9,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     let connectedWallet = null;
 
     // Function to dynamically load the SPL Token library
-    const loadSplTokenLibrary = () => {
-        try {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
-            script.onload = () => resolve(window.splToken);
-            script.onerror = () => reject(new Error('Failed to load SPL Token library'));
-            document.head.appendChild(script);
-        })
-        } catch (err){
-            messageParagraph.textContent += `\nError: ${err}`;
-}
-    };
+const loadSplTokenLibrary = () => {
+    return new Promise((resolve, reject) => {
+        // Check if SPL Token library is already loaded
+        if (window.splToken) {
+            return resolve(window.splToken);
+        }
+
+        // Load the SPL Token library if not already available
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
+        script.onload = () => {
+            // Ensure the library has loaded and is accessible
+            if (window.splToken) {
+                resolve(window.splToken);
+            } else {
+                reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+            }
+        };
+        script.onerror = () => reject(new Error('Failed to load SPL Token library'));
+        document.head.appendChild(script);
+    });
+};
+
 
     // Check if the required libraries are available
     const checkLibraries = async () => {
