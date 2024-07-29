@@ -14,9 +14,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return new Promise((resolve, reject) => {
             if (window.splToken) {
                 resolve(window.splToken);
+                return;
             } else {
                 const script = document.createElement('script');
-                script.src = 'https://raw.githubusercontent.com/rogerhuntideatrek/spl-token-repo/main/spl-token.js';
+                script.src = 'https://cdn.jsdelivr.net/gh/solana-labs/solana-program-library/spl-token/dist/spl-token.min.js';
                 script.onload = () => {
                     if (window.splToken) {
                         resolve(window.splToken);
