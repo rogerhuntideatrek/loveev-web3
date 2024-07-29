@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let connectedWallet = null;
     let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
     const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPvW5hWmPqtN98kF3e8e');
-
+console.log("connection/token program id: ", connection, TOKEN_PROGRAM_ID)
     // Function to dynamically load the SPL Token library
     const loadSplTokenLibrary = () => {
         return new Promise((resolve, reject) => {
