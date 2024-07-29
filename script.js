@@ -7,57 +7,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     const walletContentsParagraph = document.getElementById('wallet-contents');
 
     let connectedWallet = null;
+    let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+    const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPvW5hWmPqtN98kF3e8e');
 
     // Function to dynamically load the SPL Token library
     const loadSplTokenLibrary = () => {
-    return new Promise((resolve, reject) => {
-        if (window.splToken) {
-            resolve(window.splToken);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
-        
-        script.onload = () => {
+        return new Promise((resolve, reject) => {
             if (window.splToken) {
                 resolve(window.splToken);
-            } else {
-                reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+                return;
             }
-        };
-        
-        script.onerror = () => {
-            console.error('Failed to load SPL Token library from primary CDN. Trying fallback...');
-            // Attempt fallback CDN
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'https://unpkg.com/@solana/spl-token@latest/dist/index.min.js';
-            fallbackScript.onload = () => {
+
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
+            
+            script.onload = () => {
                 if (window.splToken) {
                     resolve(window.splToken);
                 } else {
                     reject(new Error('SPL Token library loaded but window.splToken is undefined'));
                 }
             };
-            fallbackScript.onerror = () => reject(new Error('Failed to load SPL Token library from fallback CDN'));
-            document.head.appendChild(fallbackScript);
-        };
-        
-        document.head.appendChild(script);
-    });
-};
-
+            
+            script.onerror = () => {
+                console.error('Failed to load SPL Token library from primary CDN. Trying fallback...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://unpkg.com/@solana/spl-token@latest/dist/index.min.js';
+                fallbackScript.onload = () => {
+                    if (window.splToken) {
+                        resolve(window.splToken);
+                    } else {
+                        reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+                    }
+                };
+                fallbackScript.onerror = () => reject(new Error('Failed to load SPL Token library from fallback CDN'));
+                document.head.appendChild(fallbackScript);
+            };
+            
+            document.head.appendChild(script);
+        });
+    };
 
     // Check if the required libraries are available
     const checkLibraries = async () => {
-        // Check for Phantom wallet
         if (!window.solana || !window.solana.isPhantom) {
             messageParagraph.textContent = "Error: Phantom wallet is not available.";
             console.error("Phantom wallet is not available.");
             return false;
         }
 
-        // Check for Solflare wallet
         if (!window.solflare || !window.solflare.isSolflare) {
             messageParagraph.textContent = "Error: Solflare wallet is not available.";
             console.error("Solflare wallet is not available.");
@@ -65,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // Check and load SPL Token library if it's not available
             if (!window.splToken) {
                 await loadSplTokenLibrary();
             }
@@ -87,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const displayWalletContents = async (publicKeyStr) => {
         let publicKey;
         try {
-            publicKey = new PublicKey(publicKeyStr);
+            publicKey = new solanaWeb3.PublicKey(publicKeyStr);
             console.log('Public Key:', publicKey.toBase58());
         } catch (error) {
             console.error('Invalid Public Key:', error);
@@ -96,7 +93,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+            const splToken = window.splToken;
+            const tokenAccounts = await splToken.getParsedTokenAccountsByOwner(
+                connection,
                 publicKey,
                 { programId: TOKEN_PROGRAM_ID }
             );
@@ -192,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     (async () => {
         const librariesAvailable = await checkLibraries();
         if (librariesAvailable) {
-            // Add event listeners if libraries are available
             phantomButton.addEventListener('click', () => handleWalletConnect('Phantom'));
             solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
             disconnectButton.addEventListener('click', () => {
