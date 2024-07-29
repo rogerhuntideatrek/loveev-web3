@@ -8,20 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let connectedWallet = null;
 
-    // Check if libraries are available
-    if (!window.solanaWeb3 || !window.splToken) {
-        messageParagraph.textContent = "Error: Required libraries are not available.";
-        if (!window.solanaWeb3){
-            messageParagraph.textContent += `\nsolanaWeb3 not available.`;
-        }
-        
-        
+    // Check if the required libraries are available
+    if (!window.solana || !window.solana.isPhantom || !window.solflare || !window.solflare.isSolflare) {
+        messageParagraph.textContent = "Error: Required libraries or wallets are not available.";
+        console.error("Required libraries or wallets are not available.");
+        return;
     }
 
     const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
     const { TOKEN_PROGRAM_ID } = window.splToken;
 
-    // Verify TOKEN_PROGRAM_ID is available
     if (!TOKEN_PROGRAM_ID) {
         messageParagraph.textContent += `\nTOKEN_PROGRAM_ID is not available.`;
         console.error("TOKEN_PROGRAM_ID is not available.");
@@ -60,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     console.log('Token Account:', account);
 
-                    if (account && account.account && account.account.data && account.account.data.parsed) {
+                    if (account.account.data.parsed && account.account.data.parsed.info.tokenAmount) {
                         const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
                         if (balance > 100000) {
                             hasLargeBalance = true;
@@ -91,63 +87,46 @@ document.addEventListener('DOMContentLoaded', () => {
         if (connectedWallet) {
             messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
             return;
-        } else {
-            messageParagraph.textContent = `Connecting ${walletName}...`;
         }
 
+        messageParagraph.textContent = `Connecting ${walletName}...`;
+
         try {
+            let response;
             if (walletName === 'Phantom') {
                 if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.solana.connect();
-                        console.log('Phantom Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
-                            connectedWallet = 'Phantom';
-                            messageParagraph.textContent = "Connected with Phantom Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey.toBase58());
-                        } else {
-                            messageParagraph.textContent = 'No public key returned.';
-                        }
-                    } catch (error) {
-                        messageParagraph.textContent = `Error connecting Phantom: ${error.message}`;
-                        console.error('Error connecting Phantom:', error);
-                    }
+                    response = await window.solana.connect();
+                    console.log('Phantom Connect Response:', response);
                 } else {
                     messageParagraph.textContent = 'Phantom wallet not detected.';
+                    return;
                 }
             } else if (walletName === 'Solflare') {
                 if (window.solflare && window.solflare.isSolflare) {
-                    try {
-                        const response = await window.solflare.connect();
-                        console.log('Solflare Connect Response:', response);
-
-                        if (response.publicKey) {
-                            messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
-                            connectedWallet = 'Solflare';
-                            messageParagraph.textContent = "Connected with Solflare Wallet!";
-                            disconnectButton.style.display = 'block';
-                            phantomButton.style.display = 'none';
-                            solflareButton.style.display = 'none';
-                            displayWalletContents(response.publicKey.toBase58());
-                        } else {
-                            messageParagraph.textContent = 'No public key returned.';
-                        }
-                    } catch (error) {
-                        messageParagraph.textContent = `Error connecting Solflare: ${error.message}`;
-                        console.error('Error connecting Solflare:', error);
-                    }
+                    response = await window.solflare.connect();
+                    console.log('Solflare Connect Response:', response);
                 } else {
                     messageParagraph.textContent = 'Solflare wallet not detected.';
+                    return;
                 }
+            } else {
+                throw new Error(`Unsupported wallet: ${walletName}`);
+            }
+
+            if (response.publicKey) {
+                messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
+                connectedWallet = walletName;
+                messageParagraph.textContent = `Connected with ${walletName} Wallet!`;
+                disconnectButton.style.display = 'block';
+                phantomButton.style.display = 'none';
+                solflareButton.style.display = 'none';
+                displayWalletContents(response.publicKey.toBase58());
+            } else {
+                messageParagraph.textContent = 'No public key returned.';
             }
         } catch (error) {
-            messageParagraph.textContent = `Error: ${error.message}`;
-            console.error('Error:', error);
+            messageParagraph.textContent = `Error connecting ${walletName}: ${error.message}`;
+            console.error(`Error connecting ${walletName}:`, error);
         }
     };
 
