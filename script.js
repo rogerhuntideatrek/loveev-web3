@@ -10,27 +10,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Function to dynamically load the SPL Token library
     const loadSplTokenLibrary = () => {
-        return new Promise((resolve, reject) => {
-            if (window.splToken) {
-                // SPL Token library already loaded
-                resolve(window.splToken);
-                return;
-            }
+    return new Promise((resolve, reject) => {
+        if (window.splToken) {
+            resolve(window.splToken);
+            return;
+        }
 
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
-            script.onload = () => {
-                // Check if the library is correctly attached to window.splToken
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
+        
+        script.onload = () => {
+            if (window.splToken) {
+                resolve(window.splToken);
+            } else {
+                reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+            }
+        };
+        
+        script.onerror = () => {
+            console.error('Failed to load SPL Token library from primary CDN. Trying fallback...');
+            // Attempt fallback CDN
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://unpkg.com/@solana/spl-token@latest/dist/index.min.js';
+            fallbackScript.onload = () => {
                 if (window.splToken) {
                     resolve(window.splToken);
                 } else {
                     reject(new Error('SPL Token library loaded but window.splToken is undefined'));
                 }
             };
-            script.onerror = () => reject(new Error('Failed to load SPL Token library'));
-            document.head.appendChild(script);
-        });
-    };
+            fallbackScript.onerror = () => reject(new Error('Failed to load SPL Token library from fallback CDN'));
+            document.head.appendChild(fallbackScript);
+        };
+        
+        document.head.appendChild(script);
+    });
+};
+
 
     // Check if the required libraries are available
     const checkLibraries = async () => {
