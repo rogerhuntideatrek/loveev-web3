@@ -14,9 +14,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return new Promise((resolve, reject) => {
             if (window.splToken) {
                 resolve(window.splToken);
-                return;
             } else {
-                reject(new Error('SPL Token library is not loaded.'));
+                const script = document.createElement('script');
+                script.src = 'https://raw.githubusercontent.com/rogerhuntideatrek/spl-token-repo/main/spl-token.js';
+                script.onload = () => {
+                    if (window.splToken) {
+                        resolve(window.splToken);
+                    } else {
+                        reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+                    }
+                };
+                script.onerror = () => reject(new Error('Failed to load SPL Token library'));
+                document.head.appendChild(script);
             }
         });
     };
@@ -63,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const splToken = window.splToken;
+            const splToken = await ensureSplTokenLibrary();
             const tokenAccounts = await splToken.getParsedTokenAccountsByOwner(
                 connection,
                 publicKey,
