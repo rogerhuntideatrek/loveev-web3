@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let connectedWallet = null;
     let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-    const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPvW5hWmPqtN98kF3e8e');
-    console.log("connection/token program id: ", connection, TOKEN_PROGRAM_ID);
 
     // Ensure SPL Token library is available
     const ensureSplTokenLibrary = () => {
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tokenAccounts = await splToken.getParsedTokenAccountsByOwner(
                 connection,
                 publicKey,
-                { programId: TOKEN_PROGRAM_ID }
+                { programId: splToken.TOKEN_PROGRAM_ID } // Use TOKEN_PROGRAM_ID from splToken
             );
 
             console.log("Raw Token Accounts Response:", tokenAccounts);
