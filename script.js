@@ -81,63 +81,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Function to display the contents of the wallet
-    const displayWalletContents = async (publicKeyStr) => {
-        let publicKey;
-        try {
-            publicKey = new solanaWeb3.PublicKey(publicKeyStr);
-            console.log('Public Key:', publicKey.toBase58());
-        } catch (error) {
-            console.error('Invalid Public Key:', error);
-            messageParagraph.textContent = `Error: Invalid Public Key - ${error.message}`;
-            return;
+ const displayWalletContents = async (publicKeyStr) => {
+    let publicKey;
+    try {
+        // Validate the public key string format
+        if (typeof publicKeyStr !== 'string' || publicKeyStr.length !== 44) {
+            throw new Error('Public key must be a 44-character base58 string.');
         }
 
-        try {
-            const splToken = window.splToken;
-            const tokenAccounts = await splToken.getParsedTokenAccountsByOwner(
-                connection,
-                publicKey,
-                { programId: TOKEN_PROGRAM_ID }
-            );
+        publicKey = new solanaWeb3.PublicKey(publicKeyStr);
+        console.log('Public Key:', publicKey.toBase58());
+    } catch (error) {
+        console.error('Invalid Public Key:', error);
+        messageParagraph.textContent = `Error: Invalid Public Key - ${error.message}`;
+        return;
+    }
 
-            console.log("Raw Token Accounts Response:", tokenAccounts);
+    try {
+        const splToken = window.splToken;
+        const tokenAccounts = await splToken.getParsedTokenAccountsByOwner(
+            connection,
+            publicKey,
+            { programId: TOKEN_PROGRAM_ID }
+        );
 
-            if (!tokenAccounts || !tokenAccounts.value) {
-                throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
-            }
+        console.log("Raw Token Accounts Response:", tokenAccounts);
 
-            walletContentsParagraph.innerHTML = '';
-            let hasLargeBalance = false;
+        if (!tokenAccounts || !tokenAccounts.value) {
+            throw new Error('Unexpected response format from getParsedTokenAccountsByOwner.');
+        }
 
-            tokenAccounts.value.forEach((account) => {
-                try {
-                    console.log('Token Account:', account);
+        walletContentsParagraph.innerHTML = '';
+        let hasLargeBalance = false;
 
-                    if (account.account.data.parsed && account.account.data.parsed.info.tokenAmount) {
-                        const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
-                        if (balance > 100000) {
-                            hasLargeBalance = true;
-                            walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
-                        }
-                    } else {
-                        console.warn("Unexpected account data format:", account);
+        tokenAccounts.value.forEach((account) => {
+            try {
+                console.log('Token Account:', account);
+
+                if (account.account.data.parsed && account.account.data.parsed.info.tokenAmount) {
+                    const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
+                    if (balance > 100000) {
+                        hasLargeBalance = true;
+                        walletContentsParagraph.innerHTML += `Token Account: ${account.pubkey.toBase58()} - Balance: ${balance}<br>`;
                     }
-                } catch (accountError) {
-                    console.error("Error processing token account:", accountError);
-                    walletContentsParagraph.innerHTML += `Error processing token account: ${accountError.message}<br>`;
+                } else {
+                    console.warn("Unexpected account data format:", account);
                 }
-            });
-
-            if (!hasLargeBalance) {
-                walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
+            } catch (accountError) {
+                console.error("Error processing token account:", accountError);
+                walletContentsParagraph.innerHTML += `Error processing token account: ${accountError.message}<br>`;
             }
+        });
 
-            walletInfoDiv.style.display = 'block';
-        } catch (fetchError) {
-            console.error('Error fetching token accounts:', fetchError);
-            messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
+        if (!hasLargeBalance) {
+            walletContentsParagraph.textContent = 'No token accounts with more than 100,000 tokens.';
         }
-    };
+
+        walletInfoDiv.style.display = 'block';
+    } catch (fetchError) {
+        console.error('Error fetching token accounts:', fetchError);
+        messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
+    }
+};
 
     // Function to handle wallet connection
     const handleWalletConnect = async (walletName) => {
