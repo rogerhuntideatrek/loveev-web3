@@ -9,68 +9,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     let connectedWallet = null;
 
     // Function to dynamically load the SPL Token library
-const loadSplTokenLibrary = () => {
-    return new Promise((resolve, reject) => {
-        // Check if SPL Token library is already loaded
-        if (window.splToken) {
-            return resolve(window.splToken);
-        }
-
-        // Load the SPL Token library if not already available
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
-        script.onload = () => {
-            // Ensure the library has loaded and is accessible
+    const loadSplTokenLibrary = () => {
+        return new Promise((resolve, reject) => {
             if (window.splToken) {
+                // SPL Token library already loaded
                 resolve(window.splToken);
-            } else {
-                reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+                return;
             }
-        };
-        script.onerror = () => reject(new Error('Failed to load SPL Token library'));
-        document.head.appendChild(script);
-    });
-};
 
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.min.js';
+            script.onload = () => {
+                // Check if the library is correctly attached to window.splToken
+                if (window.splToken) {
+                    resolve(window.splToken);
+                } else {
+                    reject(new Error('SPL Token library loaded but window.splToken is undefined'));
+                }
+            };
+            script.onerror = () => reject(new Error('Failed to load SPL Token library'));
+            document.head.appendChild(script);
+        });
+    };
 
     // Check if the required libraries are available
     const checkLibraries = async () => {
+        // Check for Phantom wallet
         if (!window.solana || !window.solana.isPhantom) {
-            messageParagraph.textContent += `\nError: Phantom wallet is not available.`;
+            messageParagraph.textContent = "Error: Phantom wallet is not available.";
             console.error("Phantom wallet is not available.");
             return false;
         }
 
-         // Check for Solflare wallet
+        // Check for Solflare wallet
         if (!window.solflare || !window.solflare.isSolflare) {
-            messageParagraph.textContent += `\nError: Solflare wallet is not available.`;
+            messageParagraph.textContent = "Error: Solflare wallet is not available.";
             console.error("Solflare wallet is not available.");
             return false;
         }
 
         try {
+            // Check and load SPL Token library if it's not available
             if (!window.splToken) {
-                // Load SPL Token library if it's not already available
                 await loadSplTokenLibrary();
             }
 
             if (!window.splToken || !window.splToken.TOKEN_PROGRAM_ID) {
-                messageParagraph.textContent += `\nError: SPL Token wallet is not available.`;
-                console.error("SPL Token library is not available.");
+                messageParagraph.textContent = "Error: SPL Token library is not available.";
+                console.error("SPL Token library is not available or TOKEN_PROGRAM_ID is undefined.");
                 return false;
             }
         } catch (error) {
-            messageParagraph.textContent += `\nError: ${error.message}`;
+            messageParagraph.textContent = `Error: ${error.message}`;
             console.error('Error:', error);
             return false;
         }
         return true;
     };
-
-    const { Connection, PublicKey, clusterApiUrl } = window.solanaWeb3;
-    const { TOKEN_PROGRAM_ID } = window.splToken;
-
-    const connection = new Connection(clusterApiUrl('mainnet-beta'));
 
     // Function to display the contents of the wallet
     const displayWalletContents = async (publicKeyStr) => {
@@ -80,7 +75,7 @@ const loadSplTokenLibrary = () => {
             console.log('Public Key:', publicKey.toBase58());
         } catch (error) {
             console.error('Invalid Public Key:', error);
-            messageParagraph.textContent += `\nError: Invalid Public Key - ${error.message}`;
+            messageParagraph.textContent = `Error: Invalid Public Key - ${error.message}`;
             return;
         }
 
@@ -125,18 +120,18 @@ const loadSplTokenLibrary = () => {
             walletInfoDiv.style.display = 'block';
         } catch (fetchError) {
             console.error('Error fetching token accounts:', fetchError);
-            messageParagraph.textContent += `\nError fetching token accounts: ${fetchError.message}`;
+            messageParagraph.textContent = `Error fetching token accounts: ${fetchError.message}`;
         }
     };
 
     // Function to handle wallet connection
     const handleWalletConnect = async (walletName) => {
         if (connectedWallet) {
-            messageParagraph.textContent += `\nAlready connected with ${connectedWallet} wallet. Please disconnect first.`;
+            messageParagraph.textContent = `Already connected with ${connectedWallet} wallet. Please disconnect first.`;
             return;
         }
 
-        messageParagraph.textContent += `\nConnecting ${walletName}...`;
+        messageParagraph.textContent = `Connecting ${walletName}...`;
 
         try {
             let response;
@@ -145,7 +140,7 @@ const loadSplTokenLibrary = () => {
                     response = await window.solana.connect();
                     console.log('Phantom Connect Response:', response);
                 } else {
-                    messageParagraph.textContent += '\nPhantom wallet not detected.';
+                    messageParagraph.textContent = 'Phantom wallet not detected.';
                     return;
                 }
             } else if (walletName === 'Solflare') {
@@ -153,7 +148,7 @@ const loadSplTokenLibrary = () => {
                     response = await window.solflare.connect();
                     console.log('Solflare Connect Response:', response);
                 } else {
-                    messageParagraph.textContent += `\nSolflare wallet not detected.`;
+                    messageParagraph.textContent = 'Solflare wallet not detected.';
                     return;
                 }
             } else {
@@ -161,18 +156,18 @@ const loadSplTokenLibrary = () => {
             }
 
             if (response.publicKey) {
-                messageParagraph.textContent += `\nPublic Key: ${response.publicKey.toBase58()}`;
+                messageParagraph.textContent = `Public Key: ${response.publicKey.toBase58()}`;
                 connectedWallet = walletName;
-                messageParagraph.textContent += `\nConnected with ${walletName} Wallet!`;
+                messageParagraph.textContent = `Connected with ${walletName} Wallet!`;
                 disconnectButton.style.display = 'block';
                 phantomButton.style.display = 'none';
                 solflareButton.style.display = 'none';
                 displayWalletContents(response.publicKey.toBase58());
             } else {
-                messageParagraph.textContent += `\nNo public key returned.`;
+                messageParagraph.textContent = 'No public key returned.';
             }
         } catch (error) {
-            messageParagraph.textContent += `\nError connecting ${walletName}: ${error.message}`;
+            messageParagraph.textContent = `Error connecting ${walletName}: ${error.message}`;
             console.error(`Error connecting ${walletName}:`, error);
         }
     };
@@ -180,7 +175,7 @@ const loadSplTokenLibrary = () => {
     // Initialize and check libraries
     (async () => {
         const librariesAvailable = await checkLibraries();
-      
+        if (librariesAvailable) {
             // Add event listeners if libraries are available
             phantomButton.addEventListener('click', () => handleWalletConnect('Phantom'));
             solflareButton.addEventListener('click', () => handleWalletConnect('Solflare'));
@@ -189,9 +184,9 @@ const loadSplTokenLibrary = () => {
                 phantomButton.style.display = 'block';
                 solflareButton.style.display = 'block';
                 disconnectButton.style.display = 'none';
-                messageParagraph.textContent += `\nDisconnected.`;
+                messageParagraph.textContent = "Disconnected.";
                 walletInfoDiv.style.display = 'none';
             });
-  
+        }
     })();
 });
